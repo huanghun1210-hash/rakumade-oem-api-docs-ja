@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OEM 公開 API ドキュメント</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans JP", sans-serif; color: #333; line-height: 1.8; display: flex; min-height: 100vh; background: #f5f5f5; }
+        .sidebar { width: 300px; min-width: 300px; background: #fff; border-right: 1px solid #e0e0e0; padding: 0; overflow-y: auto; height: 100vh; position: sticky; top: 0; box-shadow: 2px 0 8px rgba(0,0,0,0.04); }
+        .sidebar .header { padding: 28px 24px 20px; border-bottom: 1px solid #f0f0f0; }
+        .sidebar .header h2 { font-size: 18px; color: #1a1a2e; font-weight: 700; }
+        .sidebar .header p { font-size: 12px; color: #999; margin-top: 4px; }
+        .chapter { border-bottom: 1px solid #f5f5f5; }
+        .chapter-title { display: flex; align-items: center; padding: 14px 24px; cursor: pointer; font-size: 14px; font-weight: 600; color: #333; transition: all 0.2s; user-select: none; }
+        .chapter-title:hover { background: #f8f9ff; color: #1a73e8; }
+        .chapter-title .num { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: #e8ecf4; border-radius: 4px; font-size: 12px; font-weight: 700; color: #666; margin-right: 12px; flex-shrink: 0; }
+        .chapter-title .arrow { margin-left: auto; font-size: 10px; color: #bbb; transition: transform 0.2s; }
+        .chapter-title .arrow.open { transform: rotate(90deg); }
+        .chapter-items { display: none; padding: 0 0 6px 60px; }
+        .chapter-items.open { display: block; }
+        .chapter-items a { display: block; padding: 6px 0; text-decoration: none; color: #666; font-size: 13px; transition: all 0.2s; position: relative; }
+        .chapter-items a:hover { color: #1a73e8; }
+        .chapter-items a.active { color: #1a73e8; font-weight: 600; }
+        .chapter-items a::before { content: ''; position: absolute; left: -20px; top: 50%; width: 12px; height: 1px; background: #ddd; }
+        .content { flex: 1; max-width: 1200px; padding: 48px 64px; background: #fff; margin: 24px 24px 24px 12px; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+        .content h1 { font-size: 28px; margin-bottom: 8px; color: #1a1a2e; }
+        .content .subtitle { font-size: 14px; color: #888; margin-bottom: 32px; }
+        .content h2 { font-size: 20px; margin: 40px 0 4px; color: #1a1a2e; }
+        .content h2 .num { color: #1a73e8; margin-right: 8px; }
+        .content h3 { font-size: 16px; margin: 28px 0 12px; color: #444; font-weight: 600; }
+        .content h3 .num { color: #1a73e8; margin-right: 6px; }
+        .content h4 { font-size: 15px; margin: 20px 0 8px; color: #555; font-weight: 600; }
+        .content p { margin: 10px 0; color: #555; }
+        .content ul, .content ol { margin: 8px 0 16px 24px; color: #555; }
+        .content li { margin: 4px 0; }
+        .content code { background: #f0f2f5; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; color: #d63384; }
+        .content pre { background: #f6f8fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 16px; overflow-x: auto; margin: 16px 0; }
+        .content pre code { background: none; padding: 0; color: inherit; }
+        .content table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; border-radius: 8px; overflow: hidden; }
+        .content table th { background: #f0f4ff; font-weight: 600; color: #1a1a2e; }
+        .content th, .content td { padding: 10px 16px; text-align: left; border: 1px solid #e8ecf4; }
+        .content blockquote { background: #f0f6ff; border-left: 4px solid #1a73e8; padding: 12px 16px; border-radius: 4px; margin: 16px 0; font-size: 14px; }
+        .content blockquote code { background: #dce8ff; }
+        .endpoint { background: #f8faff; border: 1px solid #dce8ff; border-radius: 6px; padding: 10px 16px; margin: 12px 0; font-family: monospace; font-size: 14px; }
+        .endpoint .method { display: inline-block; background: #1a73e8; color: #fff; padding: 2px 10px; border-radius: 4px; font-weight: 600; font-size: 12px; margin-right: 8px; }
+        .endpoint .url { color: #1a73e8; font-weight: 600; }
+        .divider { border: none; border-top: 1px solid #f0f0f0; margin: 48px 0; }
+        @media (max-width: 768px) { .sidebar { display: none; } .content { margin: 0; padding: 24px; border-radius: 0; } }
+    </style>
+</head>
+<body>
+
+<!-- ===== Sidebar ===== -->
+<nav class="sidebar">
+    <div class="header"><h2>OEM 公開 API ドキュメント</h2><p>v1.0</p></div>
+
+    <div class="chapter">
+        <div class="chapter-title" onclick="toggleChapter(this)">
+            <span class="num">1</span> 利用申請
+            <span class="arrow">&#9654;</span>
+        </div>
+        <div class="chapter-items">
+            <a href="#s1">1.1 認証情報の取得</a>
+            <a href="#s2">1.2 リクエスト先 URL</a>
+        </div>
+    </div>
+
+    <div class="chapter">
+        <div class="chapter-title" onclick="toggleChapter(this)">
+            <span class="num">2</span> リクエスト形式
+            <span class="arrow">&#9654;</span>
+        </div>
+        <div class="chapter-items">
+            <a href="#s3">2.1 リクエストヘッダー</a>
+            <a href="#s4">2.2 リクエストボディ</a>
+        </div>
+    </div>
+
+    <div class="chapter">
+        <div class="chapter-title" onclick="toggleChapter(this)">
+            <span class="num">3</span> 署名アルゴリズム
+            <span class="arrow">&#9654;</span>
+        </div>
+        <div class="chapter-items">
+            <a href="#s5">3.1 署名生成手順</a>
+            <a href="#s6">3.2 PHP サンプル</a>
+            <a href="#s7">3.3 Python サンプル</a>
+            <a href="#s8">3.4 Java サンプル</a>
+        </div>
+    </div>
+
+    <div class="chapter">
+        <div class="chapter-title" onclick="toggleChapter(this)">
+            <span class="num">4</span> レスポンスとエラー
+            <span class="arrow">&#9654;</span>
+        </div>
+        <div class="chapter-items">
+            <a href="#s9">4.1 レスポンス形式</a>
+            <a href="#s10">4.2 認証エラーコード</a>
+        </div>
+    </div>
+
+    <div class="chapter">
+        <div class="chapter-title" onclick="toggleChapter(this)">
+            <span class="num">5</span> 注文 API
+            <span class="arrow">&#9654;</span>
+        </div>
+        <div class="chapter-items">
+            <a href="#api-orderDetail">5.1 注文詳細取得</a>
+        </div>
+    </div>
+
+    <div class="chapter">
+        <div class="chapter-title" onclick="toggleChapter(this)">
+            <span class="num">6</span> 配送伝票 API
+            <span class="arrow">&#9654;</span>
+        </div>
+        <div class="chapter-items">
+            <a href="#api-porderDetail">6.1 配送伝票詳細取得</a>
+        </div>
+    </div>
+
+    <div class="chapter">
+        <div class="chapter-title" onclick="toggleChapter(this)">
+            <span class="num">7</span> 倉庫 API
+            <span class="arrow">&#9654;</span>
+        </div>
+        <div class="chapter-items">
+            <a href="#api-warehouseList">7.1 倉庫在庫一覧取得</a>
+        </div>
+    </div>
+
+    <div class="chapter">
+        <div class="chapter-title" onclick="toggleChapter(this)">
+            <span class="num">8</span> 商品 API
+            <span class="arrow">&#9654;</span>
+        </div>
+        <div class="chapter-items">
+            <a href="#api-keywordSearch">8.1 キーワード検索</a>
+            <a href="#api-goodsDetail">8.2 商品詳細取得</a>
+        </div>
+    </div>
+
+    <div class="chapter">
+        <div class="chapter-title" onclick="toggleChapter(this)">
+            <span class="num">9</span> リクエスト例
+            <span class="arrow">&#9654;</span>
+        </div>
+        <div class="chapter-items">
+            <a href="#s12">9.1 cURL</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== Main content ===== -->
+<main class="content">
+
+<h1>OEM 公開 API ドキュメント</h1>
+<p class="subtitle">外部システム向けデータ取得 API 連携ガイド（HMAC-SHA256 署名認証）</p>
+
+<!-- ===== Chapter 1 ===== -->
+<h2><span class="num">1</span> 利用申請</h2>
+
+<h3 id="s1"><span class="num">1.1</span> 認証情報の取得</h3>
+<p>管理者にアプリケーション作成を依頼し、以下の認証情報を取得してください。</p>
+<table>
+    <tr><th>パラメータ</th><th>説明</th><th>例</th></tr>
+    <tr><td><code>app_id</code></td><td>アプリケーションを一意に識別する ID</td><td><code>oem_app_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5</code></td></tr>
+    <tr><td><code>app_secret</code></td><td>署名生成に使用するシークレットキー（作成時に一度だけ表示されます）</td><td><code>e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3...</code></td></tr>
+</table>
+
+<h3 id="s2"><span class="num">1.2</span> リクエスト先 URL</h3>
+<p><strong>検証環境：</strong><code>https://oemapi.rakumart.cn/open/{endpoint}</code></p>
+<p><strong>本番環境：</strong><code>https://api.rakumade.com/open/{endpoint}</code></p>
+
+
+<!-- ===== Chapter 2 ===== -->
+<h2><span class="num">2</span> リクエスト形式</h2>
+
+<h3 id="s3"><span class="num">2.1</span> リクエストヘッダー</h3>
+<p>すべての公開 API リクエストでは、HTTP ヘッダーに以下の 3 項目を指定してください。</p>
+<table>
+    <tr><th>ヘッダー</th><th>必須</th><th>説明</th></tr>
+    <tr><td><code>X-Oem-App-Id</code></td><td>必須</td><td>管理者から発行されたアプリケーション ID</td></tr>
+    <tr><td><code>X-Oem-Timestamp</code></td><td>必須</td><td>現在の Unix タイムスタンプ（秒）。サーバー時刻との差分は ±5 分以内である必要があります。</td></tr>
+    <tr><td><code>X-Oem-Signature</code></td><td>必須</td><td>HMAC-SHA256 署名（生成方法は「署名アルゴリズム」を参照）</td></tr>
+</table>
+<blockquote>補足：<code>X-Oem-Scope</code> の送信は不要です。権限スコープは、リクエストされた API に応じてサーバー側で自動判定されます。</blockquote>
+
+<h3 id="s4"><span class="num">2.2</span> リクエストボディ</h3>
+<ul>
+    <li>HTTP メソッドはすべて <code>POST</code> です。</li>
+    <li>Content-Type は <code>application/x-www-form-urlencoded</code> または <code>application/json</code> を指定できます。</li>
+</ul>
+
+<!-- ===== Chapter 3 ===== -->
+<h2><span class="num">3</span> 署名アルゴリズム</h2>
+
+<h3 id="s5"><span class="num">3.1</span> 署名生成手順</h3>
+<pre><code>1. 署名対象文字列を生成します（改行文字 \n で連結します）
+   string_to_sign = app_id + "\n" + timestamp
+
+2. app_secret をキーとして HMAC-SHA256 署名を計算し、結果を Base64 エンコードします
+   signature = base64_encode(hmac_sha256(string_to_sign, app_secret))</code></pre>
+
+<h3 id="s6"><span class="num">3.2</span> PHP サンプル</h3>
+<pre><code class="language-php">function generateSignature(string $appId, int $timestamp, string $secret): string
+{
+    $stringToSign = $appId . "\n" . $timestamp;
+    return base64_encode(hash_hmac('sha256', $stringToSign, $secret, true));
+}
+
+// 利用例
+$appId     = 'oem_app_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5';
+$secret    = 'e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d';
+$timestamp = time();
+$signature = generateSignature($appId, $timestamp, $secret);
+
+$headers = [
+    'X-Oem-App-Id'      => $appId,
+    'X-Oem-Timestamp'    => $timestamp,
+    'X-Oem-Signature'    => $signature,
+];</code></pre>
+
+<h3 id="s7"><span class="num">3.3</span> Python サンプル</h3>
+<pre><code class="language-python">import time
+import base64
+import hmac
+import hashlib
+
+def generate_signature(app_id: str, timestamp: int, secret: str) -> str:
+    string_to_sign = f"{app_id}\n{timestamp}"
+    sign = hmac.new(secret.encode(), string_to_sign.encode(), hashlib.sha256).digest()
+    return base64.b64encode(sign).decode()
+
+app_id = 'oem_app_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5'
+secret = 'e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d'
+timestamp = int(time.time())
+signature = generate_signature(app_id, timestamp, secret)
+
+headers = {
+    'X-Oem-App-Id': app_id,
+    'X-Oem-Timestamp': str(timestamp),
+    'X-Oem-Signature': signature,
+}</code></pre>
+
+<h3 id="s8"><span class="num">3.4</span> Java サンプル</h3>
+<pre><code class="language-java">import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
+
+public class OemSigner {
+    public static String generateSignature(String appId, long timestamp, String secret) throws Exception {
+        String stringToSign = appId + "\n" + timestamp;
+        Mac mac = Mac.getInstance("HmacSHA256");
+        mac.init(new SecretKeySpec(secret.getBytes("UTF-8"), "HmacSHA256"));
+        byte[] signBytes = mac.doFinal(stringToSign.getBytes("UTF-8"));
+        return Base64.getEncoder().encodeToString(signBytes);
+    }
+}</code></pre>
+
+<!-- ===== Chapter 4 ===== -->
+<h2><span class="num">4</span> レスポンスとエラー</h2>
+
+<h3 id="s9"><span class="num">4.1</span> レスポンス形式</h3>
+<h4>成功レスポンス</h4>
+<pre><code class="language-json">{
+    "code": 0,
+    "msg": "操作成功",
+    "data": {},
+    "success": true
+}</code></pre>
+<h4>エラーレスポンス</h4>
+<pre><code class="language-json">{
+    "code": 1000,
+    "msg": "错误信息",
+    "data": "",
+    "success": false
+}</code></pre>
+
+<h3 id="s10"><span class="num">4.2</span> 認証エラーコード</h3>
+<table>
+    <tr><th>HTTP ステータスコード</th><th>msg</th><th>説明</th></tr>
+    <tr><td>401</td><td>请求已过期</td><td>タイムスタンプとサーバー時刻の差分が 5 分を超えています。</td></tr>
+    <tr><td>401</td><td>无效的 AppId 或应用已停用</td><td><code>app_id</code> が存在しない、または停止されています。</td></tr>
+    <tr><td>401</td><td>无此接口权限</td><td>アプリケーションに対象 API の利用権限が付与されていません。</td></tr>
+    <tr><td>401</td><td>签名验证失败</td><td>署名の計算結果が一致しません。署名生成処理を確認してください。</td></tr>
+</table>
+
+<!-- ===== Chapter 5 ===== -->
+<h2><span class="num">5</span> 注文 API</h2>
+<p><strong>ベースパス：</strong><code>/open/</code></p>
+<p><strong>HTTP メソッド：</strong><code>POST</code></p>
+
+<h3 id="api-orderDetail"><span class="num">5.1</span> 注文詳細取得</h3>
+<div class="endpoint"><span class="method">POST</span><span class="url">orderDetail</span></div>
+<p>注文番号を指定して、注文の詳細情報を取得します。</p>
+<table>
+    <tr><th>パラメータ</th><th>型</th><th>必須</th><th>説明</th></tr>
+    <tr><td>order_sn</td><td>string</td><td>必須</td><td>注文番号</td></tr>
+</table>
+
+<p><strong>レスポンスフィールド：</strong></p>
+<table>
+    <tr><th>フィールド</th><th>型</th><th>説明</th></tr>
+    <tr><td>order_info.order_sn</td><td>string</td><td>注文番号</td></tr>
+    <tr><td>warehouse_info.warehouse_name</td><td>string</td><td>中国国内の入庫倉庫</td></tr>
+    <tr><td>products</td><td>array</td><td>商品明細</td></tr>
+    <tr><td>products[].no</td><td>int</td><td>明細番号</td></tr>
+    <tr><td>products[].shop_name</td><td>string</td><td>店舗名</td></tr>
+    <tr><td>products[].product_url</td><td>string</td><td>商品 URL</td></tr>
+    <tr><td>products[].image</td><td>string</td><td>商品画像</td></tr>
+    <tr><td>products[].product_name</td><td>string</td><td>商品名</td></tr>
+    <tr><td>products[].product_detail</td><td>string</td><td>商品詳細</td></tr>
+    <tr><td>products[].unit_price</td><td>string</td><td>単価（¥ 表記）</td></tr>
+    <tr><td>products[].quantity</td><td>int</td><td>数量</td></tr>
+    <tr><td>products[].subtotal</td><td>string</td><td>小計（¥ 表記）</td></tr>
+    <tr><td>products[].option</td><td>string</td><td>オプション</td></tr>
+    <tr><td>products[].remark</td><td>string</td><td>備考</td></tr>
+    <tr><td>statistics.total_sku</td><td>int</td><td>SKU 総数</td></tr>
+    <tr><td>statistics.total_quantity</td><td>int</td><td>サンプル総数量</td></tr>
+    <tr><td>fees.goods_amount</td><td>float</td><td>商品金額（元）</td></tr>
+    <tr><td>fees.goods_amount_jpy</td><td>int</td><td>商品金額（円）</td></tr>
+    <tr><td>fees.service_rate</td><td>float</td><td>手数料率（%）</td></tr>
+    <tr><td>fees.service_fee</td><td>float</td><td>手数料（元）</td></tr>
+    <tr><td>fees.service_fee_jpy</td><td>int</td><td>手数料（円）</td></tr>
+    <tr><td>fees.domestic_shipping</td><td>float</td><td>中国国内送料（元）</td></tr>
+    <tr><td>fees.domestic_shipping_jpy</td><td>int</td><td>中国国内送料（円）</td></tr>
+    <tr><td>fees.option_fee</td><td>float</td><td>オプション料金（元）</td></tr>
+    <tr><td>fees.option_fee_jpy</td><td>int</td><td>オプション料金（円）</td></tr>
+    <tr><td>fees.other_fee</td><td>int</td><td>その他費用（元）</td></tr>
+    <tr><td>fees.other_fee_jpy</td><td>int</td><td>その他費用（円）</td></tr>
+    <tr><td>exchange_rate.rate</td><td>float</td><td>為替レート</td></tr>
+    <tr><td>exchange_rate.label</td><td>string</td><td>為替レート表示（1 元 = ? 円）</td></tr>
+    <tr><td>total.total_cny</td><td>float</td><td>注文合計額（元）</td></tr>
+    <tr><td>total.total_jpy</td><td>int</td><td>注文合計額（円）</td></tr>
+    <tr><td>total.total_label</td><td>string</td><td>注文合計額の目安（元 / 円 表記）</td></tr>
+</table>
+
+<p><strong>レスポンス例：</strong></p>
+<pre><code class="language-json">{
+    "code": 0,
+    "msg": "操作成功",
+    "data": {
+        "order_info": {
+            "order_sn": "Y20260515154934-313979-XH"
+        },
+        "warehouse_info": {
+            "warehouse_name": "广州"
+        },
+        "products": [
+            {
+                "no": 1,
+                "shop_name": "广州衫阁服饰有限公司",
+                "product_url": "https://detail.1688.com/offer/718035230...",
+                "image": "商品缩略图",
+                "product_name": "襟260グラムの重ポンドpoloシャツ",
+                "product_detail": "カラー：ホワイト / サイズ：S",
+                "unit_price": "¥98.00",
+                "quantity": 1,
+                "subtotal": "¥98.00",
+                "option": "① made in China ラベル貼り",
+                "remark": ""
+            }
+        ],
+        "statistics": {
+            "total_sku": 1,
+            "total_quantity": 1
+        },
+        "fees": {
+            "goods_amount": 98.00,
+            "goods_amount_jpy": 2416,
+            "service_rate": 5,
+            "service_fee": 4.90,
+            "service_fee_jpy": 121,
+            "domestic_shipping": 0.00,
+            "domestic_shipping_jpy": 0,
+            "option_fee": 0.30,
+            "option_fee_jpy": 7,
+            "other_fee": 0,
+            "other_fee_jpy": 0
+        },
+        "exchange_rate": {
+            "rate": 24.65,
+            "label": "1元 = 24.65円"
+        },
+        "total": {
+            "total_cny": 103.20,
+            "total_jpy": 2544,
+            "total_label": "103.20元 / 2,544円"
+        }
+    },
+    "success": true
+}</code></pre>
+
+<!-- ===== Chapter 6 ===== -->
+<h2><span class="num">6</span> 配送伝票 API</h2>
+
+<h3 id="api-porderDetail"><span class="num">6.1</span> 配送伝票詳細取得</h3>
+<div class="endpoint"><span class="method">POST</span><span class="url">porderDetail</span></div>
+<p>配送伝票番号を指定して、配送に関する詳細情報を取得します。</p>
+<table>
+    <tr><th>パラメータ</th><th>型</th><th>必須</th><th>説明</th></tr>
+    <tr><td>porder_sn</td><td>string</td><td>必須</td><td>配送伝票番号</td></tr>
+</table>
+
+<p><strong>レスポンスフィールド：</strong></p>
+<table>
+    <tr><th>フィールド</th><th>型</th><th>説明</th></tr>
+    <tr><td>delivery_info.porder_sn</td><td>string</td><td>配送伝票番号</td></tr>
+    <tr><td>product_list</td><td>array</td><td>商品一覧</td></tr>
+    <tr><td>product_list[].no</td><td>int</td><td>明細番号</td></tr>
+    <tr><td>product_list[].order_sn</td><td>string</td><td>注文番号</td></tr>
+    <tr><td>product_list[].warehouse_jp</td><td>string</td><td>日本国内の納品先倉庫</td></tr>
+    <tr><td>product_list[].remark</td><td>string</td><td>備考</td></tr>
+    <tr><td>box_detail</td><td>array</td><td>梱包箱の明細</td></tr>
+    <tr><td>box_detail[].box_no</td><td>int</td><td>箱番号</td></tr>
+    <tr><td>box_detail[].spec_cm</td><td>string</td><td>箱サイズ（cm）</td></tr>
+    <tr><td>box_detail[].volume_cm3</td><td>int</td><td>容積（cm³）</td></tr>
+    <tr><td>box_detail[].actual_weight_kg</td><td>float</td><td>実重量（kg）</td></tr>
+    <tr><td>box_detail[].charge_weight_kg</td><td>float</td><td>課金重量（kg）</td></tr>
+    <tr><td>box_detail[].shipping_method</td><td>string</td><td>配送方法</td></tr>
+    <tr><td>box_detail[].tracking_no</td><td>string</td><td>国際追跡番号</td></tr>
+    <tr><td>shipping_fee</td><td>object</td><td>国際送料情報</td></tr>
+    <tr><td>shipping_fee.shipping_method</td><td>string</td><td>配送方法</td></tr>
+    <tr><td>shipping_fee.charge_weight_kg</td><td>float</td><td>課金重量（kg）</td></tr>
+    <tr><td>shipping_fee.shipping_fee_cny</td><td>float</td><td>国際送料（元）</td></tr>
+    <tr><td>shipping_fee.shipping_fee_jpy</td><td>int</td><td>国際送料（円）</td></tr>
+    <tr><td>shipping_fee.payment_amount_jpy</td><td>int</td><td>支払予定金額（円）</td></tr>
+    <tr><td>shipping_fee.exchange_rate_label</td><td>string</td><td>為替レート表示</td></tr>
+    <tr><td>importer_info</td><td>object</td><td>輸入者情報</td></tr>
+    <tr><td>importer_info.name</td><td>string</td><td>氏名</td></tr>
+    <tr><td>importer_info.name_rome</td><td>string</td><td>氏名（ローマ字）</td></tr>
+    <tr><td>importer_info.zip</td><td>string</td><td>郵便番号</td></tr>
+    <tr><td>importer_info.mobile</td><td>string</td><td>携帯電話番号</td></tr>
+    <tr><td>importer_info.address</td><td>string</td><td>住所</td></tr>
+    <tr><td>importer_info.address_rome</td><td>string</td><td>住所（ローマ字）</td></tr>
+    <tr><td>importer_info.corporate_num</td><td>string</td><td>法人番号</td></tr>
+    <tr><td>importer_info.standard_code</td><td>string</td><td>輸出入者標準コード</td></tr>
+    <tr><td>importer_info.company</td><td>string</td><td>会社名</td></tr>
+    <tr><td>receiver_info</td><td>object</td><td>配送先情報</td></tr>
+    <tr><td>receiver_info.name</td><td>string</td><td>氏名</td></tr>
+    <tr><td>receiver_info.name_rome</td><td>string</td><td>氏名（ローマ字）</td></tr>
+    <tr><td>receiver_info.zip</td><td>string</td><td>郵便番号</td></tr>
+    <tr><td>receiver_info.mobile</td><td>string</td><td>携帯電話番号</td></tr>
+    <tr><td>receiver_info.address</td><td>string</td><td>住所</td></tr>
+    <tr><td>receiver_info.address_rome</td><td>string</td><td>住所（ローマ字）</td></tr>
+    <tr><td>receiver_info.company</td><td>string</td><td>会社名</td></tr>
+    <tr><td>receiver_info.company_en</td><td>string</td><td>会社名（英語）</td></tr>
+    <tr><td>receiver_info.tel</td><td>string</td><td>電話番号</td></tr>
+    <tr><td>receiver_info.shop_image</td><td>string</td><td>店舗画像</td></tr>
+    <tr><td>summary</td><td>object</td><td>金額サマリー</td></tr>
+    <tr><td>summary.sku_count</td><td>int</td><td>SKU 数</td></tr>
+    <tr><td>summary.total_quantity</td><td>int</td><td>商品数量</td></tr>
+    <tr><td>summary.total_amount_jpy</td><td>int</td><td>商品金額合計（円）</td></tr>
+    <tr><td>summary.other_fee_jpy</td><td>int</td><td>その他費用（円）</td></tr>
+    <tr><td>summary.shipping_fee_jpy</td><td>int</td><td>国際送料（円）</td></tr>
+    <tr><td>summary.payment_jpy</td><td>int</td><td>支払予定金額（円）</td></tr>
+</table>
+
+<p><strong>レスポンス例：</strong></p>
+<pre><code class="language-json">{
+    "code": 0,
+    "msg": "操作成功",
+    "data": {
+        "delivery_info": {
+            "porder_sn": "OP20260521154044-313979"
+        },
+        "product_list": [
+            {
+                "no": 1,
+                "order_sn": "Y20260515154934-313979-XH",
+                "warehouse_jp": "らくらく Amazon.co.jp KIX1 FBA 入庫係",
+                "remark": ""
+            }
+        ],
+        "box_detail": [
+            {
+                "box_no": 1,
+                "spec_cm": "58×51×50",
+                "volume_cm3": 147900,
+                "actual_weight_kg": 1.0,
+                "charge_weight_kg": 25.0,
+                "shipping_method": "EMS（義鳥）",
+                "tracking_no": "2026年5月21日 15:50:32"
+            }
+        ],
+        "shipping_fee": {
+            "shipping_method": "EMS（義鳥）",
+            "charge_weight_kg": 25.0,
+            "shipping_fee_cny": 544,
+            "shipping_fee_jpy": 13257,
+            "payment_amount_jpy": 13257,
+            "exchange_rate_label": "1元=24.37円"
+        },
+        "importer_info": {
+            "name": "rakuraku",
+            "name_rome": "王様",
+            "zip": "192-1111",
+            "mobile": "09069264950",
+            "address": "東京都八王子市○○番",
+            "address_rome": "tokyotohatioujisimarumarubann",
+            "corporate_num": "",
+            "standard_code": "P002ET410000",
+            "company": "rakuraky"
+        },
+        "receiver_info": {
+            "name": "1",
+            "name_rome": "1",
+            "zip": "590-8589",
+            "mobile": "11111111111",
+            "address": "大阪府堺市堺区築港八幡町138-7",
+            "address_rome": "138-7,Chikkoyawatamachi,Sakai",
+            "company": "",
+            "tel": "",
+            "shop_image": ""
+        },
+        "summary": {
+            "sku_count": 1,
+            "total_quantity": 1,
+            "total_amount_jpy": 2416,
+            "other_fee_jpy": 0,
+            "shipping_fee_jpy": 13257,
+            "payment_jpy": 13257,
+            "exchange_rate_label": "1元=24.37円"
+        }
+    },
+    "success": true
+}</code></pre>
+
+<!-- ===== Chapter 7 ===== -->
+<h2><span class="num">7</span> 倉庫 API</h2>
+
+<h3 id="api-warehouseList"><span class="num">7.1</span> 倉庫在庫一覧取得</h3>
+<div class="endpoint"><span class="method">POST</span><span class="url">warehouseList</span></div>
+<p>倉庫内の商品情報をページングして取得します。</p>
+<table>
+    <tr><th>パラメータ</th><th>型</th><th>必須</th><th>説明</th></tr>
+    <tr><td>keyword</td><td>string</td><td>任意</td><td>商品名の検索キーワード</td></tr>
+    <tr><td>page</td><td>int</td><td>任意</td><td>ページ番号。未指定の場合は 1 です。</td></tr>
+    <tr><td>page_size</td><td>int</td><td>任意</td><td>1 ページあたりの件数。未指定の場合は 20 です。</td></tr>
+</table>
+
+<p><strong>レスポンスフィールド：</strong></p>
+<table>
+    <tr><th>フィールド</th><th>型</th><th>説明</th></tr>
+    <tr><td>list</td><td>array</td><td>倉庫 SKU リスト</td></tr>
+    <tr><td>list[].no</td><td>int</td><td>明細番号</td></tr>
+    <tr><td>list[].sku</td><td>string</td><td>SKU 名（日本語）</td></tr>
+    <tr><td>list[].sku_tr</td><td>string</td><td>SKU 名（中国語原文）</td></tr>
+    <tr><td>list[].sku_image</td><td>string</td><td>SKU 画像 URL</td></tr>
+    <tr><td>list[].goods_name</td><td>string</td><td>商品名</td></tr>
+    <tr><td>list[].order_sn</td><td>string</td><td>注文番号</td></tr>
+    <tr><td>list[].order_data.order_num</td><td>int</td><td>注文数量</td></tr>
+    <tr><td>list[].order_data.inbound_num</td><td>int</td><td>入庫済み数量</td></tr>
+    <tr><td>list[].order_data.outbound_num</td><td>int</td><td>出庫済み数量</td></tr>
+    <tr><td>list[].order_data.un_inbound_num</td><td>int</td><td>未入庫数量</td></tr>
+    <tr><td>list[].order_data.submitted_num</td><td>int</td><td>申請済み数量</td></tr>
+    <tr><td>list[].unit_price_jpy</td><td>int</td><td>単価（円）</td></tr>
+    <tr><td>list[].subtotal_jpy</td><td>int</td><td>小計（円）</td></tr>
+    <tr><td>list[].work_status</td><td>int</td><td>作業ステータス</td></tr>
+    <tr><td>list[].warehouse_count</td><td>int</td><td>倉庫数</td></tr>
+    <tr><td>total</td><td>int</td><td>総件数</td></tr>
+    <tr><td>page</td><td>int</td><td>現在のページ番号</td></tr>
+    <tr><td>page_size</td><td>int</td><td>1 ページあたりの件数</td></tr>
+</table>
+
+<p><strong>レスポンス例：</strong></p>
+<pre><code class="language-json">{
+    "code": 0,
+    "msg": "操作成功",
+    "data": {
+        "list": [
+            {
+                "no": 2447,
+                "sku": "黒い28cm",
+                "sku_tr": "黑色28cm",
+                "sku_image": "https://oss.example.com/xxx.png",
+                "goods_name": "靴",
+                "order_sn": "D20260616092358-15-OEM",
+                "order_data": {
+                    "order_num": 100,
+                    "inbound_num": 100,
+                    "outbound_num": 0,
+                    "un_inbound_num": 0,
+                    "submitted_num": 0
+                },
+                "unit_price_jpy": 26,
+                "subtotal_jpy": 2640,
+                "work_status": 64,
+                "warehouse_count": 4
+            }
+        ],
+        "total": 1840,
+        "page": 1,
+        "page_size": 20
+    },
+    "success": true
+}</code></pre>
+
+
+<!-- ===== Chapter 8 ===== -->
+<h2><span class="num">8</span> 商品 API</h2>
+
+<h3 id="api-keywordSearch"><span class="num">8.1</span> キーワード検索</h3>
+<div class="endpoint"><span class="method">POST</span><span class="url">keywordSearch</span></div>
+<p>1688 または Taobao の商品を検索します。キーワード検索と商品 URL の解析に対応しています。</p>
+<table>
+    <tr><th>パラメータ</th><th>型</th><th>必須</th><th>説明</th></tr>
+    <tr><td>shop_type</td><td>string</td><td>必須</td><td><code>1</code>：1688、<code>2</code>：Taobao</td></tr>
+    <tr><td>keyWords</td><td>string</td><td>必須</td><td>検索キーワード、または 1688 / Taobao の商品 URL</td></tr>
+    <tr><td>page</td><td>int</td><td>任意</td><td>ページ番号。未指定の場合は 1 です。</td></tr>
+    <tr><td>page_size</td><td>int</td><td>任意</td><td>1 ページあたりの件数。未指定の場合は 20 です。</td></tr>
+</table>
+<p><strong>レスポンスフィールド：</strong></p>
+<table>
+    <tr><th>フィールド</th><th>型</th><th>説明</th></tr>
+    <tr><td>data_type</td><td>string</td><td><code>goods_list</code>：一覧、<code>goods_detail</code>：詳細（商品 URL を指定した場合）</td></tr>
+    <tr><td>total</td><td>int</td><td>総件数</td></tr>
+    <tr><td>list[].goods_id</td><td>string</td><td>1688 商品 ID</td></tr>
+    <tr><td>list[].mi_id</td><td>string</td><td>Taobao 商品 ID（Taobao 商品の場合に返却されます。商品詳細 API のリクエストに使用します。）</td></tr>
+    <tr><td>list[].title_cn</td><td>string</td><td>商品タイトル（原文。通常は中国語）</td></tr>
+    <tr><td>list[].price</td><td>string</td><td>価格</td></tr>
+    <tr><td>list[].image</td><td>string</td><td>商品画像 URL</td></tr>
+    <tr><td>list[].month_sold</td><td>int</td><td>月間販売数</td></tr>
+    <tr><td>list[].shop_type</td><td>string</td><td>取得元プラットフォーム（1688 / Taobao）</td></tr>
+    <tr><td>page</td><td>int</td><td>現在のページ番号</td></tr>
+    <tr><td>page_size</td><td>int</td><td>1 ページあたりの件数</td></tr>
+</table>
+
+<p><strong>レスポンス例：</strong></p>
+<pre><code class="language-json">{
+    "code": 0,
+    "data": {
+        "data_type": "goods_list",
+        "total": 2000,
+        "list": [
+            {
+                "goods_id": "951362492914",
+                "mi_id": "",
+                "title_cn": "外贸纯原莆田鞋P6000...",
+                "price": "143.00",
+                "image": "https://cbu01.alicdn.com/...",
+                "month_sold": 45,
+                "shop_type": "1688"
+            }
+        ],
+        "page": 1,
+        "page_size": 20
+    },
+    "success": true
+}</code></pre>
+
+<h3 id="api-goodsDetail"><span class="num">8.2</span> 商品詳細取得</h3>
+<div class="endpoint"><span class="method">POST</span><span class="url">goodsDetail</span></div>
+<p>1688 または Taobao の商品詳細情報を取得します。</p>
+<table>
+    <tr><th>パラメータ</th><th>型</th><th>必須</th><th>説明</th></tr>
+    <tr><td>shop_type</td><td>string</td><td>必須</td><td><code>1</code>：1688、<code>2</code>：Taobao</td></tr>
+    <tr><td>goods_id</td><td>string</td><td>必須</td><td>1688 商品 ID</td></tr>
+    <tr><td>mi_id</td><td>string</td><td>必須</td><td>Taobao / Tmall の商品 ID（Taobao 商品の場合は必須。キーワード検索または画像検索 API のレスポンスから取得します。）</td></tr>
+</table>
+<p><strong>レスポンスフィールド：</strong></p>
+<table>
+    <tr><th>フィールド</th><th>型</th><th>説明</th></tr>
+    <tr><td>offerId</td><td>int</td><td>商品 ID</td></tr>
+    <tr><td>subject</td><td>string</td><td>商品タイトル（原文。通常は中国語）</td></tr>
+    <tr><td>price</td><td>string</td><td>価格</td></tr>
+    <tr><td>images</td><td>array</td><td>商品画像リスト</td></tr>
+    <tr><td>skuInfo</td><td>array</td><td>SKU 規格情報</td></tr>
+    <tr><td>sellerOpenId</td><td>string</td><td>販売者 ID</td></tr>
+</table>
+
+<p><strong>レスポンス例：</strong></p>
+<pre><code class="language-json">{
+    "code": 0,
+    "data": {
+        "offerId": 951362492914,
+        "subject": "外贸纯原莆田鞋P6000休闲透气减震支撑低帮运动鞋男女跑步板鞋",
+        "price": "143.00",
+        "images": [...],
+        "skuInfo": [...]
+    },
+    "success": true
+}</code></pre>
+
+<!-- ===== Chapter 9 ===== -->
+<h2><span class="num">9</span> リクエスト例</h2>
+
+<h3 id="s12"><span class="num">9.1</span> cURL</h3>
+<pre><code class="language-bash">APP_ID="oem_app_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5"
+SECRET="e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d"
+TIMESTAMP=$(date +%s)
+
+# 署名を計算
+SIGNATURE=$(printf "%s\n%s" "$APP_ID" "$TIMESTAMP" | \
+    openssl dgst -sha256 -hmac "$SECRET" -binary | base64)
+
+curl -X POST "https://api.rakumade.com/open/orderList" \
+    -H "X-Oem-App-Id: $APP_ID" \
+    -H "X-Oem-Timestamp: $TIMESTAMP" \
+    -H "X-Oem-Signature: $SIGNATURE" \
+    -d "page=1&page_size=20"</code></pre>
+
+</main>
+
+<script>
+function toggleChapter(el) {
+    const items = el.nextElementSibling;
+    const arrow = el.querySelector('.arrow');
+    const isOpen = items.classList.contains('open');
+    items.classList.toggle('open');
+    arrow.classList.toggle('open');
+}
+// 初期表示では第1章を展開します
+document.querySelectorAll('.chapter')[0].querySelector('.chapter-title').click();
+document.querySelectorAll('.chapter-items a').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelectorAll('.chapter-items a').forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+</script>
+
+</body>
+</html>
